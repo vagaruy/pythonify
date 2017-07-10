@@ -107,22 +107,25 @@ def getallitemsforproject(project_name):
     """Retrieve all completed and remaining tasks for a project"""
     api = td.TodoistAPI()
     user = api.user.login('vipul.agarwal89@gmail.com', 'nealcaffrey')
+    print(user)
     response = api.sync()
-
-    project_id = -1
-    for project in response['projects']:
-        if project['name'] == project_name:
-            project_id = project['id']
-            break
-
     items = []
-    if project_id != -1:
-        for item in response['items']:
-            if item['project_id'] == project_id:
-                items.append(item['content'])
-    else:
-        print("Project Name cannot be found in the account")
+    project_id = -1
+    if 'projects' in response:
+        for project in response['projects']:
+            if project['name'] == project_name:
+                project_id = project['id']
+                break
 
+
+        if project_id != -1:
+            for item in response['items']:
+                if item['project_id'] == project_id:
+                    items.append(item['content'])
+        else:
+            print("Project Name cannot be found in the account")
+    else:
+        print("Projects data not returned in the API call")
     return items
 
 
@@ -168,7 +171,7 @@ while True:
     try:
         # Grab and save data in current folder and then later try to match with it. More failsafe than other methods.
         text_1 = getallitemsforproject(PROJECT)
-        time.sleep(5)
+        time.sleep(60)
         text_2 = getallitemsforproject(PROJECT)
         if text_2 != text_1:
             print("setting overlay..")
